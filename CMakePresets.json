@@ -1,0 +1,113 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 2
+  },
+  "configurePresets": [
+    {
+      "name": "dev",
+      "displayName": "CPU Debug utilities/tests",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/dev",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "RI_MESHING_ENABLE_OPENMP": "ON",
+        "RI_MESHING_ENABLE_CUDA": "OFF",
+        "RI_MESHING_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "CPU Release utilities/tests",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "RI_MESHING_ENABLE_OPENMP": "ON",
+        "RI_MESHING_ENABLE_CUDA": "OFF",
+        "RI_MESHING_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "cuda",
+      "displayName": "CUDA Debug pipeline/tests",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/cuda",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CUDA_ARCHITECTURES": {
+          "type": "STRING",
+          "value": "native"
+        },
+        "RI_MESHING_ENABLE_OPENMP": "ON",
+        "RI_MESHING_ENABLE_CUDA": "ON",
+        "RI_MESHING_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "cuda-release-native",
+      "displayName": "CUDA Release for the host architecture",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/cuda-native-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": {
+          "type": "STRING",
+          "value": "native"
+        },
+        "RI_MESHING_ENABLE_OPENMP": "ON",
+        "RI_MESHING_ENABLE_CUDA": "ON",
+        "RI_MESHING_BUILD_TESTS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "cuda",
+      "configurePreset": "cuda"
+    },
+    {
+      "name": "cuda-release-native",
+      "configurePreset": "cuda-release-native"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "cuda",
+      "configurePreset": "cuda",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "cuda-release-native",
+      "configurePreset": "cuda-release-native",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

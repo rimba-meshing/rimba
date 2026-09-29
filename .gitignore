@@ -1,0 +1,14 @@
+.idea/
+build/
+cmake-build-*/
+compile_commands.json
+*.user
+*.swp
+*.swo
+__pycache__/
+
+.vscode/
+
+tools/stitch_debug_viewer/.venv/
+
+results/
