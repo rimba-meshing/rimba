@@ -25,12 +25,22 @@ package-manager workflow.
 
 - CMake 4.2 or newer.
 - A C++23-compatible compiler.
-- CUDA Toolkit with `nvcc` and a supported NVIDIA GPU for meshing runs.
+- CUDA Toolkit with `nvcc` and a supported NVIDIA GPU for meshing runs. CUDA
+  Toolkit 13.2.78 is the oldest version recorded in the development history;
+  treat it as a known baseline, not a verified minimum. Earlier versions have
+  not been tested against this repository.
 - OpenMP is enabled when available; it is optional for configuration.
 
 The CPU presets build shared utilities and CPU tests. The meshing executable
 requires a CUDA build. Python is not required by the library; the experiments
 repository uses Python 3.10 or newer for protocol orchestration and analysis.
+Host C++ sources are compiled as C++23, while CUDA translation units use CUDA
+C++20. Select a host compiler that supports C++23 and is supported by the
+installed `nvcc`. For CUDA 13.2 on x86_64 Linux, NVIDIA lists GCC 6–15 and
+Clang 7–21 as supported host-compiler ranges; RIMBA also requires C++23 support
+from the chosen compiler. See NVIDIA's
+[CUDA 13.2 Linux installation guide](https://docs.nvidia.com/cuda/archive/13.2.0/cuda-installation-guide-linux/index.html)
+for the full host-compiler and platform matrix.
 
 ## Build and test
 
@@ -115,8 +125,14 @@ repository pins its selected source revision as a Git submodule and documents
 the datasets, build variants, benchmark boundaries, and analysis procedure in
 its [reproducibility guide](https://github.com/rimba-meshing/rimba-experiments/blob/main/REPRODUCIBILITY.md).
 
-## Citation and distribution
+## Paper and citation
 
-RIMBA is research software under active development. Citation and license
-information will be added when the associated publication and release terms
-are finalized.
+The paper describing RIMBA is in preparation.
+
+- **Paper link:** To be added when the paper is publicly available.
+- **Citation:** BibTeX entry to be added with the publication details.
+
+## License
+
+RIMBA is distributed under the MIT License. See [LICENSE](LICENSE) for the
+full text.
