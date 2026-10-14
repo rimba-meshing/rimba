@@ -26,10 +26,11 @@ package-manager workflow.
 - CMake 4.2 or newer.
 - A C++23-compatible compiler.
 - CUDA Toolkit with `nvcc` and a supported NVIDIA GPU for meshing runs.
-  A clean container has been verified with CUDA Toolkit 13.2.0
-  (`nvcc V13.2.51`), GCC 13.3, and CMake 4.2.3 on an NVIDIA RTX 4060 Laptop GPU.
+  The executable and experiment protocol have been verified with CUDA Toolkit
+  13.2.0 (`nvcc V13.2.51`), GCC 13.3, and CMake 4.2.3 on an NVIDIA RTX 4060
+  Laptop GPU.
   Earlier CUDA releases have not been verified. See the
-  [experiments Docker workflow](https://github.com/rimba-meshing/rimba-experiments/blob/main/docker/README.md)
+  [experiment requirements](https://github.com/rimba-meshing/rimba-experiments/blob/main/REPRODUCIBILITY.md#requirements)
   for the complete environment and dependency pins.
 - OpenMP is enabled when available; it is optional for configuration.
 
@@ -88,7 +89,8 @@ select an explicit architecture when building for a different GPU.
 The CPU Debug suite currently reports assertion failures in
 `stitch_candidates_tests`, `stitch_matching_tests`, `stitch_connection_tests`,
 and `hole_filling_tests`. The other four CPU tests pass. The CUDA executable
-and experiment protocol are checked separately in the container workflow.
+and experiment protocol have been checked separately with the documented
+experiment environment.
 
 ## Run the meshing executable
 
