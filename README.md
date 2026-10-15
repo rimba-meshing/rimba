@@ -30,7 +30,7 @@ package-manager workflow.
   13.2.0 (`nvcc V13.2.51`), GCC 13.3, and CMake 4.2.3 on an NVIDIA RTX 4060
   Laptop GPU.
   Earlier CUDA releases have not been verified. See the
-  [experiment requirements](https://github.com/rimba-meshing/rimba-experiments/blob/main/REPRODUCIBILITY.md#requirements)
+  [experiment requirements](https://github.com/rimba-meshing/rimba-experiments/blob/main/README.md#requirements)
   for the complete environment and dependency pins.
 - OpenMP is enabled when available; it is optional for configuration.
 
@@ -134,7 +134,7 @@ recorded by the corresponding commit in
 [RIMBA Experiments](https://github.com/rimba-meshing/rimba-experiments). That
 repository pins its selected source revision as a Git submodule and documents
 the datasets, build variants, benchmark boundaries, and analysis procedure in
-its [reproducibility guide](https://github.com/rimba-meshing/rimba-experiments/blob/main/REPRODUCIBILITY.md).
+its [README](https://github.com/rimba-meshing/rimba-experiments#readme).
 
 ## Paper and citation
 
