@@ -1,0 +1,83 @@
+name: gpu-sim
+
+# Optional check. The hosted runners have no GPU, so this builds the CUDA tests
+# and runs them on a simulated NVIDIA H100
+# (https://github.com/pantheongpu/pantheonsim). A simulator cannot reproduce
+# hardware-specific behavior or timing, so it complements runs on real GPUs.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/**"
+      - "include/**"
+      - "tests/**"
+      - "CMakeLists.txt"
+      - ".github/workflows/gpu-sim.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  cuda-tests:
+    name: CUDA tests (CUDA 13.0 and simulated H100)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+
+      - name: Set up the simulated GPU and CUDA toolkit
+        uses: pantheongpu/setup-pantheonsim@deff5781e8adfd83dec98dd5242dcbc96a564773 # v0.1.10
+        with:
+          gpu: nvidia/h100
+          cuda-toolkit: "13.0"
+
+      # CMakeLists.txt needs CMake 4.2.
+      - name: Install CMake 4.2
+        run: |
+          python3 -m venv "$RUNNER_TEMP/cmake-venv"
+          "$RUNNER_TEMP/cmake-venv/bin/pip" install cmake==4.2.3
+          echo "$RUNNER_TEMP/cmake-venv/bin" >> "$GITHUB_PATH"
+
+      # Debug, because the filter tests check their results with assert.
+      # The simulator runs PTX only and needs a shared CUDA runtime.
+      - name: Configure and build
+        run: |
+          cmake --version
+          vgpu run --preload cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CUDA_ARCHITECTURES=90-virtual \
+            -DCMAKE_CUDA_RUNTIME_LIBRARY=Shared \
+            -DRI_MESHING_ENABLE_CUDA=ON
+          vgpu run --preload cmake --build build -j3 --target \
+            ri_range_filter_cuda_tests ri_thin_filter_cuda_tests accumulated_depth_culling_tests
+          if grep -E '"command".*(ri_range_filter|ri_thin_filter)_cuda_tests\.cpp' build/compile_commands.json | grep -q NDEBUG; then
+            echo "::error::the filter tests were built with NDEBUG, so their asserts are off"; exit 1
+          fi
+
+      # Each test exits non-zero (or aborts on an assert) on a wrong result.
+      # The guard also fails the job on a simulator error or a missing device,
+      # and requires a launch of the kernels each test checks.
+      - name: Run the CUDA tests on the simulated GPU
+        run: |
+          set -o pipefail
+          run() {
+            local test=$1 kernel=$2
+            echo "::group::$test"
+            vgpu run --counters "./build/$test" 2>&1 | tee "$test.log"
+            echo "::endgroup::"
+            if grep -Eiq 'VirtualGPU error|no (usable )?(cuda )?device|skipped' "$test.log"; then
+              echo "::error::$test: simulator error, missing device or skipped test"; exit 1
+            fi
+            # --counters prints one line per simulated kernel launch.
+            grep -F '[vgpu][counters]' "$test.log" | grep -Fq "$kernel" \
+              || { echo "::error::$test: no launch of $kernel"; exit 1; }
+          }
+          run ri_range_filter_cuda_tests filter_small_range_components_kernel
+          run ri_thin_filter_cuda_tests removed_kernel
+          run accumulated_depth_culling_tests rasterize_accumulated_faces_fast_kernel
